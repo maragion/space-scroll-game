@@ -3,11 +3,13 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 import { SpaceFieldComponent } from './components/space-field/space-field.component';
+import { PlayerShipComponent } from './components/player-ship/player-ship.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    SpaceFieldComponent
+    SpaceFieldComponent,
+    PlayerShipComponent
   ],
   imports: [
     BrowserModule
