@@ -17,6 +17,7 @@ export class SpaceFieldComponent implements AfterViewInit {
   }
 
   fallingStars: {}[] = []
+  shoot: boolean = false
 
 
   createStars() {
