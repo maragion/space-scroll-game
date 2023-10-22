@@ -9,15 +9,12 @@ import {Asteroid} from "../../interfaces/asteroid";
 export class AsteroidComponent implements OnInit {
 
   asteroids: Asteroid[] = []
+  lastTimestamp: number = 0;
 
   ngOnInit() {
     this.generateAsteroids()
-    this.animateAsteroids()
+    this.animateAsteroids(0)
   }
-
-
-  positionX: number | null = null;
-  positionY: number | null = null;
 
   async generateAsteroids() {
     const numAster = 50;
@@ -39,23 +36,27 @@ export class AsteroidComponent implements OnInit {
     }
   }
 
-  animateAsteroids() {
-    const animate = () => {
-      for (let asteroid of this.asteroids) {
-        let speed = Math.random() * 10
-        let y: number = Math.round(Number(asteroid.top.replace(/[^0-9.]/g, '')))
-        let x: number = Math.round(Number(asteroid.left.replace(/[^0-9.]/g, '')))
+  animateAsteroids(timestamp: number) {
 
-        asteroid.top = `${y + speed}px`;
-        asteroid.left = `${x + speed}px`;
+    if (!this.lastTimestamp) {
+      this.lastTimestamp = timestamp;
+    }
 
-        if (y > window.innerHeight || x > window.innerWidth) {
-          this.asteroids.findIndex((asteroid, i) => this.asteroids.splice(i, 1))
-        }
+    const deltaTime = timestamp - this.lastTimestamp;
+    for (let asteroid of this.asteroids) {
+      let speed = Math.random() * deltaTime
+      let y: number = parseInt(asteroid.top, 10)
+      let x: number = parseInt(asteroid.left, 10)
+
+      asteroid.top = `${y + speed}px`;
+      asteroid.left = `${x + speed}px`;
+
+      if (y > window.innerHeight || x > window.innerWidth) {
+        this.asteroids.findIndex((asteroid, i) => this.asteroids.splice(i, 1))
       }
-      requestAnimationFrame(animate);
-    };
-    requestAnimationFrame(animate);
+    }
+    this.lastTimestamp = timestamp;
+    requestAnimationFrame(this.animateAsteroids.bind(this));
   }
 
   delay(ms: number) {

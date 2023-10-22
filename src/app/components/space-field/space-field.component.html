@@ -1,5 +1,5 @@
-<div class="starry-background" (mousemove)="getCoords($event)" (mousedown)="shoot = true" (mouseup)="shoot = false">
+<div class="starry-background" (mousemove)="getCoords($event)" >
   <div class="star" *ngFor="let i of fallingStars" [ngStyle]="i"></div>
 </div>
-<app-player-ship [fire]="shoot"></app-player-ship>
+<app-player-ship></app-player-ship>
 <app-asteroid></app-asteroid>

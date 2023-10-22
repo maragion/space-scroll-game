@@ -11,6 +11,9 @@ export class PositionService {
 
 
   xy: Subject<Coords> = new Subject()
-
   $coords = this.xy.asObservable()
+
+  shoot: Subject<boolean> = new Subject()
+  $action =  this.shoot.asObservable()
+
 }
