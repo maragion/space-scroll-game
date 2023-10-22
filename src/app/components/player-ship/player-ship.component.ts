@@ -1,4 +1,4 @@
-import {Component, HostListener, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {PositionService} from "../../services/position/position.service";
 import {Coords} from "../../interfaces/coords";
 import {Laser} from "../../interfaces/laser";

@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, HostListener,} from '@angular/core';
+import {AfterViewInit, Component,} from '@angular/core';
 import {PositionService} from "../../services/position/position.service";
 import {Coords} from "../../interfaces/coords";
 
@@ -17,8 +17,6 @@ export class SpaceFieldComponent implements AfterViewInit {
   }
 
   fallingStars: {}[] = []
-  shoot: boolean = false
-
 
   createStars() {
     const numStars = 100;
@@ -43,8 +41,6 @@ export class SpaceFieldComponent implements AfterViewInit {
     top: "",
     left: ""
   };
-  intervalId: any = null;
-
 
   getCoords(event: MouseEvent) {
     this.coords = {
