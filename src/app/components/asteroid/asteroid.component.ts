@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {Asteroid} from "../../interfaces/asteroid";
+import {PositionService} from "../../services/position/position.service";
 
 @Component({
   selector: 'app-asteroid',
@@ -8,12 +9,20 @@ import {Asteroid} from "../../interfaces/asteroid";
 })
 export class AsteroidComponent implements OnInit {
 
+  constructor(private position: PositionService) {
+  }
+
   asteroids: Asteroid[] = []
-  lastTimestamp: number = 0;
+  toRemove: any = []
 
   ngOnInit() {
+    this.position.$combined.subscribe(data => {
+      this.toRemove = data;
+      this.removeAsteroid()
+    })
     this.generateAsteroids()
-    this.animateAsteroids(0)
+    this.animateAsteroids()
+
   }
 
   async generateAsteroids() {
@@ -21,12 +30,20 @@ export class AsteroidComponent implements OnInit {
     this.asteroids = [];
 
     for (let i = 0; i < numAster; i++) {
-      const time = Math.random() * 10000;
-      const size = Math.random() * 100;
+      const time = Math.random() * 5000;
+      let size = Math.random() * 100;
+      while (size < 30) {
+        size = Math.random() * 100;
+      }
+      if (i === 49) {
+        i = 0
+      }
 
       await this.delay(time);
 
       const asteroid: Asteroid = {
+        type: "ast",
+        id: i,
         left: `${Math.random() * 100}px`,
         width: `${size}px`,
         height: `${size}px`,
@@ -36,26 +53,31 @@ export class AsteroidComponent implements OnInit {
     }
   }
 
-  animateAsteroids(timestamp: number) {
+  removeAsteroid() {
+    if (this.toRemove) {
+      this.toRemove.forEach((value: any) => {
 
-    if (!this.lastTimestamp) {
-      this.lastTimestamp = timestamp;
+        let id = value.id
+        this.asteroids = this.asteroids.filter(ast =>
+          ast.id !== id
+        )
+      })
     }
+  }
 
-    const deltaTime = timestamp - this.lastTimestamp;
+  animateAsteroids() {
     for (let asteroid of this.asteroids) {
-      let speed = Math.random() * deltaTime
+      let speed = 1
       let y: number = parseInt(asteroid.top, 10)
       let x: number = parseInt(asteroid.left, 10)
 
       asteroid.top = `${y + speed}px`;
       asteroid.left = `${x + speed}px`;
-
       if (y > window.innerHeight || x > window.innerWidth) {
         this.asteroids.findIndex((asteroid, i) => this.asteroids.splice(i, 1))
       }
     }
-    this.lastTimestamp = timestamp;
+    this.position.asteroids.next(this.asteroids)
     requestAnimationFrame(this.animateAsteroids.bind(this));
   }
 

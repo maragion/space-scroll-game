@@ -1,28 +1,9 @@
-$asteroid-color: #BAA0A1;
-$crater-color: #4D4D4D;
-
-$asteroid-size: 100px;
-$crater-size: 20px;
-$crater-spacing: 25px;
-
 .asteroid {
-  width: $asteroid-size;
-  height: $asteroid-size;
-  background-color: $asteroid-color;
+  width: 30px;
+  height: 30px;
+  background-color: #4f4141;
   border-radius: 50%;
   position: absolute;
   top: 0;
   animation: fall 2s linear;
-
 }
-
-//@keyframes fall {
-//  0% {
-//    transform: translate(-100px, -50px);
-//    opacity: 1;
-//  }
-//  100% {
-//    transform: translate(100vh, 100vh);
-//    opacity: 1;
-//  }
-//}

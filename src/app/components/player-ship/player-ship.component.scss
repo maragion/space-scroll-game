@@ -10,33 +10,15 @@
 
 
 .laser {
-  display: inline;
-  position: relative;
-
-  &::before {
-    content: "";
-    width: 3px;
-    height: 15px;
-    background: #37ff00;
-    position: absolute;
-    border: none;
-    outline: none;
-    border-radius: 20px;
-    box-shadow: 0 0 8px 5px rgba(0, 255, 0, 0.7);
-  }
-
-  &:after {
-    content: "";
-    width: 3px;
-    height: 15px;
-    background: #37ff00;
-    position: absolute;
-    border: none;
-    outline: none;
-    border-radius: 20px;
-    box-shadow: 0 0 8px 5px rgba(0, 255, 0, 0.7);
-    left: 95px;
-  }
+  content: "";
+  width: 3px;
+  height: 15px;
+  background: #37ff00;
+  position: absolute;
+  border: none;
+  outline: none;
+  border-radius: 20px;
+  box-shadow: 0 0 8px 5px rgba(0, 255, 0, 0.7);
 }
 
 

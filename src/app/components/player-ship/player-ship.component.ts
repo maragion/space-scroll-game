@@ -13,6 +13,7 @@ export class PlayerShipComponent implements OnInit {
   intervalId: any = null
   coords: Coords = {top: "", left: ""};
   coordsForFire: Laser[] = []
+  toRemove: any = []
 
   constructor(private position: PositionService) {
   }
@@ -20,14 +21,21 @@ export class PlayerShipComponent implements OnInit {
   ngOnInit() {
     this.position.$coords.subscribe(data => this.coords = data);
     this.animateLasers()
+    this.position.$combined.subscribe(data => {
+      this.toRemove = data;
+      this.laserRemove()
+    })
   }
 
   @HostListener('document:mousedown', ['$event'])
   shoot(event: MouseEvent) {
-    console.log("shoot", this.coords)
     if (event.button === 0) {
       this.intervalId = setInterval(() => {
-        this.coordsForFire.push({top: `${parseInt(this.coords.top) + 60}px`, left: this.coords.left})
+        this.coordsForFire.push({
+          type: 'las',
+          top: `${parseInt(this.coords.top)}px`,
+          left: `${parseInt(this.coords.left) + 50}px`
+        })
       }, 100)
     }
   }
@@ -40,7 +48,7 @@ export class PlayerShipComponent implements OnInit {
   animateLasers() {
     const animate = () => {
       for (let laser of this.coordsForFire) {
-        let speed = 15;
+        let speed = 10;
         let y: number = parseInt(laser.top, 10);
         laser.top = `${y - speed}px`;
         if (y < 0) {
@@ -48,8 +56,19 @@ export class PlayerShipComponent implements OnInit {
         }
       }
       requestAnimationFrame(animate);
+      this.position.lasers.next(this.coordsForFire)
     }
     requestAnimationFrame(animate);
+  }
+
+  laserRemove() {
+    if (this.toRemove) {
+      this.toRemove.forEach((value: any) => {
+        if (value.type === "las") {
+          this.coordsForFire.findIndex((value, i) => this.coordsForFire.splice(i, 1));
+        }
+      })
+    }
   }
 
 }

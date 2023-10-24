@@ -1,6 +1,9 @@
-import {AfterViewInit, Component,} from '@angular/core';
+import {AfterViewInit, Component} from '@angular/core';
 import {PositionService} from "../../services/position/position.service";
 import {Coords} from "../../interfaces/coords";
+import {Laser} from "../../interfaces/laser";
+import {Asteroid} from "../../interfaces/asteroid";
+import {filter, from, map, merge} from "rxjs";
 
 @Component({
   selector: 'app-space-field',
@@ -12,9 +15,62 @@ export class SpaceFieldComponent implements AfterViewInit {
   constructor(private position: PositionService) {
   }
 
+  lasers: Laser[] = []
+  asteroids: Asteroid[] = []
+  combined: any = []
+
   ngAfterViewInit() {
-    this.createStars()
+    this.createStars();
+
+    this.position.$asteroidsObs.subscribe((data) => {
+      this.asteroids = data;
+    });
+    this.position.$lasersObs.subscribe((data) => {
+      this.lasers = data;
+      let las = from(this.lasers);
+      let ast = from(this.asteroids)
+      let res: any = [];
+
+      this.combined = merge(
+        las.pipe(
+          map(data => ({type: 'laser', data}))
+        ),
+        ast.pipe(
+          map(data => ({type: 'asteroid', data}))
+        )
+      ).pipe(
+        filter(item => {
+          if (item.type === 'laser') {
+            const laser: Laser = item.data;
+            return this.asteroids.some(asteroid => {
+              return (
+                parseInt(laser.top) <= (parseInt(asteroid.top) + parseInt(asteroid.height)) &&
+                parseInt(laser.top) >= parseInt(asteroid.top) &&
+                parseInt(laser.left) >= parseInt(asteroid.left) &&
+                parseInt(laser.left)+3 <= (parseInt(asteroid.left) + parseInt(asteroid.width))
+              );
+            });
+          } else if (item.type === 'asteroid') {
+            const asteroid: any = item.data;
+            return this.lasers.some(laser => {
+              return (
+                parseInt(laser.top) <= (parseInt(asteroid.top) + parseInt(asteroid.height)) &&
+                parseInt(laser.top) >= parseInt(asteroid.top) &&
+                parseInt(laser.left) >= parseInt(asteroid.left) &&
+                parseInt(laser.left)+3 <= (parseInt(asteroid.left) + parseInt(asteroid.width))
+              );
+            });
+          }
+          return false
+        })
+      ).subscribe(data => {
+
+        res.push(data.data);
+      })
+      this.position.laserAndAsteroids.next(res)
+    });
   }
+
 
   fallingStars: {}[] = []
 
