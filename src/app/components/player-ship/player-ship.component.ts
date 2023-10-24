@@ -23,21 +23,28 @@ export class PlayerShipComponent implements OnInit {
     this.animateLasers()
     this.position.$combined.subscribe(data => {
       this.toRemove = data;
-      this.laserRemove()
+      this.removeLaser()
     })
   }
+
+  id: number = 0
 
   @HostListener('document:mousedown', ['$event'])
   shoot(event: MouseEvent) {
     if (event.button === 0) {
       this.intervalId = setInterval(() => {
+
         this.coordsForFire.push({
           type: 'las',
+          id: this.id++,
           top: `${parseInt(this.coords.top)}px`,
           left: `${parseInt(this.coords.left) + 50}px`
         })
+        console.log(this.id)
+
       }, 100)
     }
+    console.log(this.id)
   }
 
   @HostListener('document:mouseup', ['event'])
@@ -61,12 +68,11 @@ export class PlayerShipComponent implements OnInit {
     requestAnimationFrame(animate);
   }
 
-  laserRemove() {
+  removeLaser() {
     if (this.toRemove) {
-      this.toRemove.forEach((value: any) => {
-        if (value.type === "las") {
-          this.coordsForFire.findIndex((value, i) => this.coordsForFire.splice(i, 1));
-        }
+      this.toRemove.forEach((value: Laser) => {
+        let id = value.id;
+        this.coordsForFire = this.coordsForFire.filter(las => las.id != id)
       })
     }
   }

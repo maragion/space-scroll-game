@@ -55,7 +55,7 @@ export class AsteroidComponent implements OnInit {
 
   removeAsteroid() {
     if (this.toRemove) {
-      this.toRemove.forEach((value: any) => {
+      this.toRemove.forEach((value: Asteroid) => {
 
         let id = value.id
         this.asteroids = this.asteroids.filter(ast =>
@@ -67,7 +67,7 @@ export class AsteroidComponent implements OnInit {
 
   animateAsteroids() {
     for (let asteroid of this.asteroids) {
-      let speed = 1
+      let speed = 3
       let y: number = parseInt(asteroid.top, 10)
       let x: number = parseInt(asteroid.left, 10)
 
