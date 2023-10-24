@@ -53,11 +53,9 @@ export class PlayerShipComponent implements OnInit {
           top: `${parseInt(this.coords.top)}px`,
           left: `${parseInt(this.coords.left) + 50}px`
         })
-        console.log(this.id)
 
       }, 100)
     }
-    console.log(this.id)
   }
 
   @HostListener('document:mouseup', ['event'])
