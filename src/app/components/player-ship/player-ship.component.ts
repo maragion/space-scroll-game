@@ -1,27 +1,31 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {PositionService} from "../../services/position/position.service";
 import {Coords} from "../../interfaces/coords";
 import {Laser} from "../../interfaces/laser";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-player-ship',
   templateUrl: './player-ship.component.html',
   styleUrls: ['./player-ship.component.scss']
 })
-export class PlayerShipComponent implements OnInit {
+export class PlayerShipComponent implements OnInit, OnDestroy {
 
-  intervalId: any = null
+  intervalId: any = null;
   coords: Coords = {top: "", left: ""};
-  coordsForFire: Laser[] = []
-  toRemove: any = []
+  coordsForFire: Laser[] = [];
+  toRemove: any = [];
+  coordsSubscription: Subscription = Subscription.EMPTY;
+  combinedSubscription: Subscription = Subscription.EMPTY;
+
 
   constructor(private position: PositionService) {
   }
 
   ngOnInit() {
-    this.position.$coords.subscribe(data => this.coords = data);
+    this.coordsSubscription = this.position.$coords.subscribe(data => this.coords = data);
     this.animateLasers()
-    this.position.$combined.subscribe(data => {
+    this.combinedSubscription = this.position.$combined.subscribe(data => {
       this.toRemove = data;
       this.removeLaser()
     })
@@ -87,6 +91,16 @@ export class PlayerShipComponent implements OnInit {
         let id = value.id;
         this.coordsForFire = this.coordsForFire.filter(las => las.id != id)
       })
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.coordsSubscription) {
+      this.coordsSubscription.unsubscribe()
+    }
+
+    if (this.combinedSubscription) {
+      this.combinedSubscription.unsubscribe()
     }
   }
 

@@ -1,22 +1,24 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Asteroid} from "../../interfaces/asteroid";
 import {PositionService} from "../../services/position/position.service";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-asteroid',
   templateUrl: './asteroid.component.html',
   styleUrls: ['./asteroid.component.scss']
 })
-export class AsteroidComponent implements OnInit {
+export class AsteroidComponent implements OnInit, OnDestroy {
 
   constructor(private position: PositionService) {
   }
 
-  asteroids: Asteroid[] = []
-  toRemove: any = []
+  asteroids: Asteroid[] = [];
+  toRemove: any = [];
+  combinedSubscription: Subscription = Subscription.EMPTY;
 
   ngOnInit() {
-    this.position.$combined.subscribe(data => {
+    this.combinedSubscription = this.position.$combined.subscribe(data => {
       this.toRemove = data;
       this.removeAsteroid()
     })
@@ -83,5 +85,11 @@ export class AsteroidComponent implements OnInit {
 
   delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  ngOnDestroy() {
+    if (this.combinedSubscription) {
+      this.combinedSubscription.unsubscribe()
+    }
   }
 }

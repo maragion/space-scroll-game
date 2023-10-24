@@ -1,43 +1,40 @@
-import {AfterViewInit, Component} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy} from '@angular/core';
 import {PositionService} from "../../services/position/position.service";
 import {Coords} from "../../interfaces/coords";
 import {Laser} from "../../interfaces/laser";
 import {Asteroid} from "../../interfaces/asteroid";
-import {filter, from, map, merge} from "rxjs";
+import {filter, from, map, merge, Subscription} from "rxjs";
 
 @Component({
   selector: 'app-space-field',
   templateUrl: './space-field.component.html',
   styleUrls: ['./space-field.component.scss']
 })
-export class SpaceFieldComponent implements AfterViewInit {
+export class SpaceFieldComponent implements AfterViewInit, OnDestroy {
 
   constructor(private position: PositionService) {
   }
 
-  lasers: Laser[] = []
-  asteroids: Asteroid[] = []
-  combined: any = []
+  lasers: Laser[] = [];
+  asteroids: Asteroid[] = [];
+  combined: any = [];
+  lasersSubscription: Subscription = Subscription.EMPTY;
+  asteroidsSubscription: Subscription = Subscription.EMPTY;
+  combinedSubscription: Subscription = Subscription.EMPTY;
 
   ngAfterViewInit() {
     this.createStars();
 
-    this.position.$asteroidsObs.subscribe((data) => {
+    this.asteroidsSubscription = this.position.$asteroidsObs.subscribe((data) => {
       this.asteroids = data;
     });
-    this.position.$lasersObs.subscribe((data) => {
+    this.lasersSubscription = this.position.$lasersObs.subscribe((data) => {
       this.lasers = data;
-      let las = from(this.lasers);
-      let ast = from(this.asteroids)
-      let res: any = [];
+      let res: {}[] = [];
 
-      this.combined = merge(
-        las.pipe(
-          map(data => ({type: 'laser', data}))
-        ),
-        ast.pipe(
-          map(data => ({type: 'asteroid', data}))
-        )
+      this.combinedSubscription = this.combined = merge(
+        from(this.lasers).pipe(map(data => ({type: "laser", data}))),
+        from(this.asteroids).pipe(map(data => ({type: "asteroid", data})))
       ).pipe(
         filter(item => {
           if (item.type === 'laser') {
@@ -47,7 +44,7 @@ export class SpaceFieldComponent implements AfterViewInit {
                 parseInt(laser.top) <= (parseInt(asteroid.top) + parseInt(asteroid.height)) &&
                 parseInt(laser.top) >= parseInt(asteroid.top) &&
                 parseInt(laser.left) >= parseInt(asteroid.left) &&
-                parseInt(laser.left)+3 <= (parseInt(asteroid.left) + parseInt(asteroid.width))
+                parseInt(laser.left) + 3 <= (parseInt(asteroid.left) + parseInt(asteroid.width))
               );
             });
           } else if (item.type === 'asteroid') {
@@ -57,14 +54,13 @@ export class SpaceFieldComponent implements AfterViewInit {
                 parseInt(laser.top) <= (parseInt(asteroid.top) + parseInt(asteroid.height)) &&
                 parseInt(laser.top) >= parseInt(asteroid.top) &&
                 parseInt(laser.left) >= parseInt(asteroid.left) &&
-                parseInt(laser.left)+3 <= (parseInt(asteroid.left) + parseInt(asteroid.width))
+                parseInt(laser.left) + 3 <= (parseInt(asteroid.left) + parseInt(asteroid.width))
               );
             });
           }
           return false
         })
       ).subscribe(data => {
-
         res.push(data.data);
       })
       this.position.laserAndAsteroids.next(res)
@@ -104,12 +100,27 @@ export class SpaceFieldComponent implements AfterViewInit {
         top: `${event.y + 20}px`,
         left: `${event.x}px`
       }
-    }else if (event instanceof TouchEvent) {
+    } else if (event instanceof TouchEvent) {
       this.coords = {
         top: `${event.touches[0].clientY - 50}px`,
         left: `${event.touches[0].clientX - 60}px`
       }
     }
     this.position.xy.next(this.coords)
+  }
+
+
+  ngOnDestroy() {
+    if (this.combinedSubscription) {
+      this.combinedSubscription.unsubscribe()
+    }
+
+    if (this.lasersSubscription) {
+      this.lasersSubscription.unsubscribe()
+    }
+
+    if (this.asteroidsSubscription) {
+      this.asteroidsSubscription.unsubscribe()
+    }
   }
 }
