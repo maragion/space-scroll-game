@@ -98,10 +98,17 @@ export class SpaceFieldComponent implements AfterViewInit {
     left: ""
   };
 
-  getCoords(event: MouseEvent) {
-    this.coords = {
-      top: `${event.y + 20}px`,
-      left: `${event.x}px`
+  getCoords(event: MouseEvent | TouchEvent) {
+    if (event instanceof MouseEvent) {
+      this.coords = {
+        top: `${event.y + 20}px`,
+        left: `${event.x}px`
+      }
+    }else if (event instanceof TouchEvent) {
+      this.coords = {
+        top: `${event.touches[0].clientY - 50}px`,
+        left: `${event.touches[0].clientX - 60}px`
+      }
     }
     this.position.xy.next(this.coords)
   }

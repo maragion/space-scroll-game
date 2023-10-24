@@ -30,8 +30,21 @@ export class PlayerShipComponent implements OnInit {
   id: number = 0
 
   @HostListener('document:mousedown', ['$event'])
-  shoot(event: MouseEvent) {
-    if (event.button === 0) {
+  @HostListener('document:touchstart', ['$event'])
+  shoot(event: MouseEvent | TouchEvent) {
+    if (event instanceof MouseEvent) {
+      if (event.button === 0) {
+        this.intervalId = setInterval(() => {
+
+          this.coordsForFire.push({
+            type: 'las',
+            id: this.id++,
+            top: `${parseInt(this.coords.top)}px`,
+            left: `${parseInt(this.coords.left) + 50}px`
+          })
+        }, 100)
+      }
+    }else if (event instanceof TouchEvent) {
       this.intervalId = setInterval(() => {
 
         this.coordsForFire.push({
@@ -48,6 +61,8 @@ export class PlayerShipComponent implements OnInit {
   }
 
   @HostListener('document:mouseup', ['event'])
+  @HostListener('document:touchend', ['event'])
+
   clear() {
     clearInterval(this.intervalId)
   }
