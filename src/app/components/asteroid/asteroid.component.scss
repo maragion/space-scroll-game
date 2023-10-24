@@ -5,18 +5,8 @@
   border-radius: 50%;
   position: absolute;
   top: 0;
-  animation: fall 2s linear;
   z-index: 0;
+  display: block;
   cursor: none;
   pointer-events: none;
-  &:hover {
-    cursor: none;
-  }
-
-}
-div {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
 }

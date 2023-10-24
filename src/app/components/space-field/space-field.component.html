@@ -1,5 +1,6 @@
 <div class="starry-background" (mousemove)="getCoords($event)" (touchmove)="getCoords($event)">
   <div class="star" *ngFor="let i of fallingStars" [ngStyle]="i"></div>
+  <app-player-ship></app-player-ship>
+  <app-asteroid></app-asteroid>
 </div>
-<app-player-ship></app-player-ship>
-<app-asteroid></app-asteroid>
+
